@@ -30,11 +30,11 @@ const Login = () => {
       
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <Card className="w-full max-w-md shadow-lg">
+          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-accent">
             <CardHeader className="text-center space-y-2">
               <div className="flex justify-center mb-2">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Pill className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-accent/20 rounded-full border-2 border-accent/30">
+                  <Pill className="h-8 w-8 text-accent" />
                 </div>
               </div>
               <CardTitle className="text-2xl">Welcome to PharmaCare</CardTitle>
@@ -43,9 +43,9 @@ const Login = () => {
             
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 mb-6 bg-accent/10">
+                  <TabsTrigger value="login" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">Login</TabsTrigger>
+                  <TabsTrigger value="register" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">Register</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
