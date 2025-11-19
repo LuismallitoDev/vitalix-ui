@@ -61,7 +61,7 @@ const Store = () => {
               
               <CardContent className="flex-grow">
                 <div className="h-32 bg-muted rounded-md flex items-center justify-center mb-4">
-                  <Pill className="h-12 w-12 text-primary/40" />
+                  <Pill className="h-12 w-12 text-primary/40" /> 
                 </div>
                 <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
               </CardContent>

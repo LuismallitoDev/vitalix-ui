@@ -13,7 +13,7 @@ const Navigation = () => {
           
           <div className="flex items-center gap-6">
             <NavLink
-              to="/"
+              to="/login"
               end
               className="flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors"
               activeClassName="text-primary font-medium"
@@ -23,7 +23,7 @@ const Navigation = () => {
             </NavLink>
             
             <NavLink
-              to="/store"
+              to="/"
               className="flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors"
               activeClassName="text-primary font-medium"
             >

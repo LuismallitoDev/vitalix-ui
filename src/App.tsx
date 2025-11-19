@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPass";
 
 const queryClient = new QueryClient();
 
@@ -17,9 +18,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/store" element={<Store />} />
+          <Route path="/" element={<Store />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/reset-password" element={<ForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

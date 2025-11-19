@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pill } from "lucide-react";
 import Navigation from "@/components/Navigation";
-
+import SignUp from "./SignUp";
+import SignIn from "./SignIn";
 const Login = () => {
+  // --- STATE MANAGEMENT ---
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
 
+  // Animation State
+  const [isActive, setIsActive] = useState(false);
+
+  // --- HANDLERS ---
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login:", { loginEmail, loginPassword });
@@ -24,112 +24,106 @@ const Login = () => {
     console.log("Register:", { registerName, registerEmail, registerPassword });
   };
 
+  const handleGoogleAuth = () => {
+    console.log("Google Auth Clicked");
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      {/* CUSTOM STYLES */}
+      <style>
+        {`
+          @keyframes move {
+            0%, 49.99% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+          }
+          /* Only apply the complex z-index animation on desktop */
+          @media (min-width: 768px) {
+            .animate-fast-move {
+              animation: move 0.3s;
+            }
+          }
+        `}
+      </style>
       <Navigation />
-      
-      <div className="container mx-auto px-4 pt-24 pb-12">
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-accent transition-all duration-500 hover:shadow-2xl">
-            <CardHeader className="text-center space-y-2">
-              <div className="flex justify-center mb-2">
-                <div className="p-3 bg-accent/20 rounded-full border-2 border-accent/30 transition-all duration-300 hover:bg-accent/30 hover:scale-110 hover:rotate-12">
-                  <Pill className="h-8 w-8 text-accent transition-transform duration-300" />
+      <div className="min-h-screen bg-[#f0f4f8] font-['Montserrat',sans-serif] text-slate-700 flex flex-col">
+
+
+
+        <div className="flex-1 flex items-center justify-center py-12 px-4">
+
+          {/* MAIN CONTAINER 
+              - Mobile: w-full, max-w-[400px], min-h-[550px]
+              - Desktop: w-[768px], min-h-[480px]
+          */}
+          <div className={`bg-white rounded-[30px] shadow-[0_5px_15px_rgba(0,0,0,0.1)] relative overflow-hidden w-full max-w-[400px] min-h-[550px] md:max-w-full md:w-[768px] md:min-h-[480px] transition-all duration-300 ${isActive ? 'active' : ''}`}>
+
+            {/* ---------------- SIGN UP FORM ---------------- */}
+            <SignUp
+              isActive={isActive}
+              setIsActive={setIsActive}
+              handleGoogleAuth={handleGoogleAuth}
+              registerName={registerName}
+              setRegisterName={setRegisterName}
+              registerEmail={registerEmail}
+              setRegisterEmail={setRegisterEmail}
+              registerPassword={registerPassword}
+              setRegisterPassword={setRegisterPassword}
+              handleRegister={handleRegister}
+            />
+
+            {/* ---------------- SIGN IN FORM ---------------- */}
+            <SignIn
+              isActive={isActive}
+              setIsActive={setIsActive}
+              handleGoogleAuth={handleGoogleAuth}
+              loginEmail={loginEmail}
+              setLoginEmail={setLoginEmail}
+              loginPassword={loginPassword}
+              setLoginPassword={setLoginPassword}
+              handleLogin={handleLogin}
+            />
+
+            {/* ---------------- TOGGLE OVERLAY (DESKTOP ONLY) ---------------- */}
+            <div className={`hidden md:block absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-all duration-300 ease-in-out z-[1000] 
+              ${isActive ? '-translate-x-full rounded-[0_150px_100px_0]' : 'rounded-[150px_0_0_100px]'}`}>
+
+              <div className={`bg-gradient-to-r from-[#81c784] to-[#43a047] text-white relative -left-full h-full w-[200%] transition-all duration-300 ease-in-out 
+                ${isActive ? 'translate-x-1/2' : 'translate-x-0'}`}>
+
+                <div className={`absolute w-1/2 h-full flex items-center justify-center flex-col px-8 text-center top-0 transition-all duration-300 ease-in-out transform 
+                  ${isActive ? 'translate-x-0' : '-translate-x-[200%]'}`}>
+                  <h1 className="text-3xl font-bold mb-4">Welcome Back!</h1>
+                  <p className="text-[14px] leading-5 tracking-wide my-5">Enter your personal details to use all of site features</p>
+                  <button
+                    className="bg-transparent border border-white text-white text-xs py-2.5 px-11 rounded-lg font-semibold uppercase cursor-pointer hover:bg-white hover:text-[#43a047] transition-colors"
+                    onClick={() => setIsActive(false)}
+                  >
+                    Sign In
+                  </button>
                 </div>
+
+                <div className={`absolute right-0 w-1/2 h-full flex items-center justify-center flex-col px-8 text-center top-0 transition-all duration-300 ease-in-out transform 
+                  ${isActive ? 'translate-x-[200%]' : 'translate-x-0'}`}>
+                  <h1 className="text-3xl font-bold mb-4">Hello, Friend!</h1>
+                  <p className="text-[14px] leading-5 tracking-wide my-5">Register with your personal details to use all of site features</p>
+                  <button
+                    className="bg-transparent border border-white text-white text-xs py-2.5 px-11 rounded-lg font-semibold uppercase cursor-pointer hover:bg-white hover:text-[#43a047] transition-colors"
+                    onClick={() => setIsActive(true)}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+
               </div>
-              <CardTitle className="text-2xl">Welcome to Vitalix Plus</CardTitle>
-              <CardDescription>Access your account or create a new one</CardDescription>
-            </CardHeader>
-            
-            <CardContent>
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6 bg-accent/10">
-                  <TabsTrigger value="login" className="transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-md">Login</TabsTrigger>
-                  <TabsTrigger value="register" className="transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-md">Register</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login">
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="login-email">Email</Label>
-                      <Input
-                        id="login-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="login-password">Password</Label>
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                      Sign In
-                    </Button>
-                  </form>
-                </TabsContent>
-                
-                <TabsContent value="register">
-                  <form onSubmit={handleRegister} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="register-name">Full Name</Label>
-                      <Input
-                        id="register-name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={registerName}
-                        onChange={(e) => setRegisterName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="register-email">Email</Label>
-                      <Input
-                        id="register-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={registerEmail}
-                        onChange={(e) => setRegisterEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="register-password">Password</Label>
-                      <Input
-                        id="register-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-                      Create Account
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+            </div>
+
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
+
 
 export default Login;
