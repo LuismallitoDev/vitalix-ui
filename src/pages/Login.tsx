@@ -30,22 +30,22 @@ const Login = () => {
       
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-accent">
+          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-accent transition-all duration-500 hover:shadow-2xl">
             <CardHeader className="text-center space-y-2">
               <div className="flex justify-center mb-2">
-                <div className="p-3 bg-accent/20 rounded-full border-2 border-accent/30">
-                  <Pill className="h-8 w-8 text-accent" />
+                <div className="p-3 bg-accent/20 rounded-full border-2 border-accent/30 transition-all duration-300 hover:bg-accent/30 hover:scale-110 hover:rotate-12">
+                  <Pill className="h-8 w-8 text-accent transition-transform duration-300" />
                 </div>
               </div>
-              <CardTitle className="text-2xl">Welcome to PharmaCare</CardTitle>
+              <CardTitle className="text-2xl">Welcome to Vitalix Plus</CardTitle>
               <CardDescription>Access your account or create a new one</CardDescription>
             </CardHeader>
             
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6 bg-accent/10">
-                  <TabsTrigger value="login" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">Login</TabsTrigger>
-                  <TabsTrigger value="register" className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">Register</TabsTrigger>
+                  <TabsTrigger value="login" className="transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-md">Login</TabsTrigger>
+                  <TabsTrigger value="register" className="transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-md">Register</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
