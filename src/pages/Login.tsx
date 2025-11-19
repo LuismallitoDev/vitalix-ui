@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
-import SignUp from "./SignUp";
-import SignIn from "./SignIn";
+import SignUp from "../components/SignUp";
+import SignIn from "../components/SignIn";
+import Footer from "@/pages/Footer";
 const Login = () => {
   // --- STATE MANAGEMENT ---
   const [loginEmail, setLoginEmail] = useState("");
@@ -45,12 +46,12 @@ const Login = () => {
           }
         `}
       </style>
+      <div className="min-h-screen  bg-[#f0f4f8] font-['Montserrat',sans-serif] text-slate-700 flex flex-col">
       <Navigation />
-      <div className="min-h-screen bg-[#f0f4f8] font-['Montserrat',sans-serif] text-slate-700 flex flex-col">
 
 
 
-        <div className="flex-1 flex items-center justify-center py-12 px-4">
+        <div className="flex-1  flex items-center justify-center py-12 px-4 z-10">
 
           {/* MAIN CONTAINER 
               - Mobile: w-full, max-w-[400px], min-h-[550px]
@@ -121,6 +122,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
