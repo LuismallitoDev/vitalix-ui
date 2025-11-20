@@ -20,7 +20,7 @@ interface FilterState {
     category: string;
     minPrice: number;
     maxPrice: number;
-    sortOption: string ;
+    sortOption: string;
 }
 
 interface GlobalContextType {
@@ -33,7 +33,7 @@ interface GlobalContextType {
 
     // Cart State
     cart: CartItem[];
-    addToCart: (product: Product) => void;
+    addToCart: (product: Product, qty: number) => void;
     removeFromCart: (productId: number) => void;
     updateQuantity: (productId: number, delta: number) => void;
     clearCart: () => void;
@@ -164,17 +164,15 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         toast.info("Sesión cerrada");
     };
 
-    // --- 2. CART STATE ---
+    // --- CART STATE ---
     const [cart, setCart] = useState<CartItem[]>(() => {
         const savedCart = localStorage.getItem("vitalix_cart");
         return savedCart ? JSON.parse(savedCart) : [];
     });
+    useEffect(() => { localStorage.setItem("vitalix_cart", JSON.stringify(cart)); }, [cart]);
 
-    useEffect(() => {
-        localStorage.setItem("vitalix_cart", JSON.stringify(cart));
-    }, [cart]);
 
-    const addToCart = (product: Product) => {
+    const addToCart = (product: Product, qty: number = 1) => {
         const availableStock = product.stock || 0;
 
         if (availableStock <= 0) {
@@ -184,29 +182,40 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
         setCart((prev) => {
             const existing = prev.find((item) => item.id === product.id);
+
             if (existing) {
-                if (existing.quantity + 1 > availableStock) {
-                    toast.warning(`Solo hay ${availableStock} unidades.`);
+                const newTotal = existing.quantity + qty;
+                if (newTotal > availableStock) {
+                    toast.warning(`Stock insuficiente. Solo hay ${availableStock} unidades.`);
                     return prev;
                 }
                 toast.success("Cantidad actualizada");
-                return prev.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+                return prev.map((item) => item.id === product.id ? { ...item, quantity: newTotal } : item);
             }
+
+            if (qty > availableStock) {
+                toast.warning(`Stock insuficiente. Solo hay ${availableStock} unidades.`);
+                return prev;
+            }
+
             toast.success("Agregado al carrito");
-            return [...prev, { ...product, quantity: 1 }];
+            return [...prev, { ...product, quantity: qty }];
         });
     };
 
-    const removeFromCart = (productId: number) => {
-        setCart((prev) => prev.filter((item) => item.id !== productId));
-        toast.info("Producto eliminado");
-    };
+    const removeFromCart = (id: number) => setCart(prev => prev.filter(i => i.id !== id));
 
     const updateQuantity = (productId: number, delta: number) => {
         setCart((prev) =>
             prev.map((item) => {
                 if (item.id === productId) {
                     const newQty = item.quantity + delta;
+                    // We also need to check stock here if delta is positive, but for now let's keep it simple or pass stock in CartItem
+                    const limit = item.stock || 100;
+                    if (newQty > limit) {
+                        toast.warning("Stock máximo alcanzado");
+                        return item;
+                    }
                     return { ...item, quantity: Math.max(0, newQty) };
                 }
                 return item;
@@ -215,7 +224,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const clearCart = () => setCart([]);
-
     const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 

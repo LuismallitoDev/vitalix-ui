@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useGlobalContext } from "../hooks/useGlobalContext";
 import Admin from "@/pages/Admin";
 interface ProtectedRouteProps {
-    requiredRole?: 'admin';
+    requiredRole: 'admin';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {

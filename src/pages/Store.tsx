@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import Footer from "@/pages/Footer";
@@ -6,10 +6,13 @@ import ProductCard, { Product } from "@/components/ui/storeCard";
 import SidebarFilters from "@/components/ui/SidebarFilters";
 import { getProducts, RawProduct } from "@/lib/api";
 import { useGlobalContext } from "../hooks/useGlobalContext";
+import AddToCartModal from "@/components/ui/addToCartModal";
 
 const Store = () => {
   const { filters, setSortOption, addToCart } = useGlobalContext();
-
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // 1. FETCH DATA
   const { data: rawProducts, isLoading, error } = useQuery<RawProduct[]>({
     queryKey: ['products'],
@@ -53,12 +56,28 @@ const Store = () => {
     });
   }, [filters, products]);
 
+  // 4. HANDLERS
+  const openModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmAddToCart = (qty: number) => {
+    if (selectedProduct) {
+      addToCart(selectedProduct, qty);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#f8f9fa] font-['Montserrat',sans-serif] text-slate-700">
       <Navigation />
-
+      <AddToCartModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmAddToCart}
+        product={selectedProduct}
+      />
       {/* HEADER */}
-      <div className="bg-white border-b border-slate-200 pt-24 pb-8"  id="top-store">
+      <div className="bg-white border-b border-slate-200 pt-24 pb-8" id="top-store">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
             <span>Inicio</span>
@@ -69,6 +88,14 @@ const Store = () => {
           <p className="text-slate-500 text-sm max-w-2xl">
             Explora nuestro catálogo de productos farmacéuticos con inventario en tiempo real.
           </p>
+          {/* MOBILE FILTER TOGGLE BUTTON */}
+          <button
+            className="lg:hidden mt-4 w-full flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 py-2 rounded-lg font-medium shadow-sm hover:bg-slate-50 transition-colors"
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          >
+            <i className="fa-solid fa-filter text-[#4fc3f7]"></i>
+            {isFiltersOpen ? "Ocultar Filtros" : "Mostrar Filtros"}
+          </button>
         </div>
       </div>
 
@@ -76,12 +103,13 @@ const Store = () => {
         <div className="flex flex-col lg:flex-row gap-8 relative items-start">
 
           {/* SIDEBAR */}
-          <div className="hidden lg:block w-64 flex-shrink-0 sticky top-24 z-10">
+          <div className={`
+                lg:block w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-24 z-10
+                ${isFiltersOpen ? 'block' : 'hidden'} 
+            `}>
             <SidebarFilters />
           </div>
-          <div className="lg:hidden w-full">
-            <SidebarFilters />
-          </div>
+
 
           {/* GRID CONTENT */}
           <div className="flex-1 min-w-0">
@@ -129,8 +157,9 @@ const Store = () => {
                   <div key={product.id} className="relative h-full">
                     <ProductCard
                       product={product}
-                      onAddToCart={() => addToCart(product)}
+                      onAddToCart={() => openModal(product)}
                     />
+
                   </div>
                 ))}
               </div>

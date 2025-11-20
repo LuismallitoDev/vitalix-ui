@@ -29,7 +29,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Store />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<ProtectedRoute/>} />
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"/>} />
               <Route path="/reset-password" element={<ForgotPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

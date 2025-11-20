@@ -57,10 +57,11 @@ const SignIn: React.FC<SignInProps> = ({
                 onSubmit={handleLogin}
             >
                 <div className="mb-4 flex items-center gap-2 text-slate-700 font-bold text-xl">
-                    <i className="fa-solid fa-capsules text-[#66bb6a]"></i> Vitalix Plus
+                    <img src="src\assests\isologo.jpg" className="w-6 h-10" alt="Vitalix Plus Isologo" />
+                    Vitalix Plus
                 </div>
 
-                <h1 className="text-3xl font-bold mb-4 text-slate-800">Sign In</h1>
+                <h1 className="text-3xl font-bold mb-4 text-slate-800">Iniciar Sesión</h1>
 
                 {/* GOOGLE BUTTON WITH SVG */}
                 <div className="w-full my-3">
@@ -75,12 +76,12 @@ const SignIn: React.FC<SignInProps> = ({
                             className="w-5 h-5"
                             loading="lazy"
                         />
-                        <span>Sign in with Google</span>
+                        <span>Iniciar Sesión con Google</span>
                     </button>
                 </div>
 
                 <span className="text-xs mb-2 text-slate-500">
-                    or use your email password
+                    o utiliza tu email y contraseña
                 </span>
 
                 <input
@@ -95,7 +96,7 @@ const SignIn: React.FC<SignInProps> = ({
                 <div className="relative w-full">
                     <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder="Contraseña"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
                         required
@@ -118,35 +119,26 @@ const SignIn: React.FC<SignInProps> = ({
                 )}
 
                 <div className="w-full flex justify-between items-center mt-4 mb-4">
-                    <Link to={"/reset-password"}><span className="text-slate-600 text-[13px] no-underline hover:text-green-600 transition-colors">Forget Your Password?</span></Link>
+                    <Link to={"/reset-password"}><span className="text-slate-600 text-[13px] no-underline hover:text-green-600 transition-colors">¿Olvidaste tu Contraseña?</span></Link>
                 </div>
 
                 <button
                     disabled={loading}
+                    onClick={validateAndSubmit}
                     className="bg-[#4fc3f7] active:bg-green-400 hover:bg-[#29b6f6] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase cursor-pointer transition-colors shadow-md flex items-center gap-2"
                 >
                     {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {loading ? "Signing In..." : "Sign In"}
+                    {loading ? "Iniciando Sesión..." : "Iniciar Sesión"}
                 </button>
-
-                <div className="mt-6 block md:hidden">
-                    <p className="text-xs text-slate-500">
-                        Don't have an account? <br />
-                        <span onClick={() => setIsActive(true)} className="text-[#4fc3f7] active:bg-green-400 font-bold cursor-pointer hover:underline mt-1 inline-block">Sign Up</span>
-                    </p>
-                </div>
-
-
-
                 {/* MOBILE TOGGLE */}
                 <div className="mt-6 block md:hidden">
                     <p className="text-xs text-slate-500">
-                        Don't have an account? <br />
+                        ¿No tienes una cuenta? <br />
                         <span
                             onClick={() => setIsActive(true)}
                             className="text-[#4fc3f7] active:bg-green-400 font-bold cursor-pointer hover:underline mt-1 inline-block"
                         >
-                            Sign Up
+                            Registrate
                         </span>
                     </p>
                 </div>
