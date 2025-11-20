@@ -1,4 +1,3 @@
-import React from "react";
 import {
     Pill,
     Facebook,
@@ -7,7 +6,6 @@ import {
     Linkedin,
     Mail,
     Phone,
-    MapPin,
     ArrowRight
 } from "lucide-react";
 
@@ -24,7 +22,7 @@ const Footer = () => {
                     {/* Column 1: Brand Info */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <Pill className="h-8 w-8 text-[#4fc3f7]" />
+                            <img src="src\assests\isologo.jpg" className="w-12 h-14" alt="Vitalix Plus Isologo" />
                             <span className="text-2xl font-bold text-slate-800">Vitalix Plus</span>
                         </div>
                         <p className="text-sm leading-relaxed text-slate-500">

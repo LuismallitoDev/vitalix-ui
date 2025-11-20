@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 interface SignUpProps {
     isActive: boolean;
@@ -11,6 +12,8 @@ interface SignUpProps {
     registerPassword: string;
     setRegisterPassword: (value: string) => void;
     handleRegister: (e: React.FormEvent) => void;
+    loading: boolean;
+    error: boolean | null;
 }
 
 const SignUp: React.FC<SignUpProps> = ({
@@ -23,8 +26,42 @@ const SignUp: React.FC<SignUpProps> = ({
     setRegisterEmail,
     registerPassword,
     setRegisterPassword,
-    handleRegister
+    handleRegister,
+    loading,
+    error
 }) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Local validation error state (separate from server error)
+    const [validationError, setValidationError] = useState<string | null>(null);
+
+    const validateAndSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setValidationError(null);
+
+        // 1. Name Validation (Only letters and spaces)
+        const nameRegex = /^[A-Za-z\s]+$/;
+        if (!nameRegex.test(registerName)) {
+            setValidationError("Name can only contain letters.");
+            return;
+        }
+
+        // 2. Email Validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(registerEmail)) {
+            setValidationError("Please enter a valid email address.");
+            return;
+        }
+
+        // 3. Password Length (Optional but recommended)
+        if (registerPassword.length < 6) {
+            setValidationError("Password must be at least 6 characters.");
+            return;
+        }
+
+        // If all valid, proceed
+        handleRegister(e);
+    };
     return (
         <div className={`absolute top-0 h-full transition-all duration-300 ease-in-out left-0 
           w-full md:w-1/2 
@@ -71,18 +108,43 @@ const SignUp: React.FC<SignUpProps> = ({
                     required
                     className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
                 />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
-                    className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
-                />
 
-                <button className="bg-[#4fc3f7] hover:bg-[#29b6f6] text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase mt-4 cursor-pointer transition-colors shadow-md">
-                    Sign Up
+                {/* Password Field with Toggle */}
+                <div className="relative w-full">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={registerPassword}
+                        onChange={(e) => setRegisterPassword(e.target.value)}
+                        required
+                        className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                </div>
+
+                {/* Error Message Display (Local Validation OR Server Error) */}
+                {(validationError || error) && (
+                    <div className="w-full bg-red-50 text-red-500 text-xs py-2 px-3 rounded mt-2 border border-red-100 animate-in fade-in slide-in-from-top-1">
+                        {validationError || error}
+                    </div>
+                )}
+
+                <button
+                    disabled={loading}
+                    onClick={validateAndSubmit}
+                    className="bg-[#4fc3f7] active:bg-green-400 hover:bg-[#29b6f6] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase mt-4 cursor-pointer transition-colors shadow-md flex items-center gap-2"
+                >
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {loading ? "Creating..." : "Sign Up"}
                 </button>
+
+
 
                 {/* MOBILE TOGGLE */}
                 <div className="mt-6 block md:hidden">

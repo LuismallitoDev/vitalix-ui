@@ -36,13 +36,19 @@ const Store = () => {
   // 3. FILTER DATA
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      if (filters.category !== "All Products" && product.category !== filters.category) return false;
+      if (filters.category !== "Todos" && product.category !== filters.category) return false;
       if (filters.searchQuery && !product.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) return false;
       if (filters.maxPrice > 0 && (product.price < filters.minPrice || product.price > filters.maxPrice)) return false;
+      if (filters.searchQueryID) {
+
+        if (!product.id.toString().includes(filters.searchQueryID)) {
+          return false;
+        }
+      }
       return true;
     }).sort((a, b) => {
-      if (filters.sortOption === "Price: Low to High") return a.price - b.price;
-      if (filters.sortOption === "Price: High to Low") return b.price - a.price;
+      if (filters.sortOption === "Precio: Menor a Mayor") return a.price - b.price;
+      if (filters.sortOption === "Precio: Mayor a Menor") return b.price - a.price;
       return 0;
     });
   }, [filters, products]);
@@ -52,7 +58,7 @@ const Store = () => {
       <Navigation />
 
       {/* HEADER */}
-      <div className="bg-white border-b border-slate-200 pt-24 pb-8">
+      <div className="bg-white border-b border-slate-200 pt-24 pb-8"  id="top-store">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
             <span>Inicio</span>
@@ -91,9 +97,9 @@ const Store = () => {
                     onChange={(e) => setSortOption(e.target.value)}
                     className="appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg py-2 pl-3 pr-8 focus:outline-none focus:border-[#4fc3f7] cursor-pointer"
                   >
-                    <option>Recommended</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
+                    <option>Recomendado</option>
+                    <option>Precio: Menor a Mayor</option>
+                    <option>Precio: Mayor a Menor</option>
                   </select>
                   <i className="fa-solid fa-sort absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
 
@@ -104,7 +110,7 @@ const Store = () => {
             {isLoading && (
               <div className="flex flex-col items-center justify-center py-32">
                 <i className="fa-solid fa-spinner h-50 w-50 text-[#4fc3f7] animate-spin mb-4"></i>
-      
+
                 <p>Cargando productos...</p>
               </div>
             )}
@@ -112,7 +118,7 @@ const Store = () => {
             {error && (
               <div className="flex flex-col items-center justify-center py-32 text-red-500">
                 <i className="fa-solid fa-circle-exclamation h-8 w-8 mb-4"></i>
-                
+
                 <p>Error al cargar inventario.</p>
               </div>
             )}

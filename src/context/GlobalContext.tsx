@@ -1,4 +1,4 @@
-import  { createContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useState, useEffect, ReactNode } from "react";
 import { Product } from "../components/ui/storeCard";
 import { toast } from "sonner";
 
@@ -15,11 +15,12 @@ export interface CartItem extends Product {
 }
 
 interface FilterState {
+    searchQueryID: string | "";
     searchQuery: string;
     category: string;
     minPrice: number;
     maxPrice: number;
-    sortOption: string;
+    sortOption: string ;
 }
 
 interface GlobalContextType {
@@ -45,6 +46,7 @@ interface GlobalContextType {
     setCategory: (category: string) => void;
     setPriceRange: (min: number, max: number) => void;
     setSortOption: (option: string) => void;
+    setSearchQueryID: (query: string) => void;
 }
 
 // --- CONTEXT CREATION ---
@@ -219,23 +221,25 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
     // --- 3. FILTER STATE ---
     const [filters, setFilters] = useState<FilterState>({
+        searchQueryID: "",
         searchQuery: "",
-        category: "All Products",
-        minPrice: 0,
+        category: "Todos",
+        minPrice: null,
         maxPrice: 10000000,
-        sortOption: "Recommended"
+        sortOption: "Recomendados"
     });
 
     const setSearchQuery = (query: string) => setFilters(prev => ({ ...prev, searchQuery: query }));
     const setCategory = (category: string) => setFilters(prev => ({ ...prev, category }));
     const setPriceRange = (min: number, max: number) => setFilters(prev => ({ ...prev, minPrice: min, maxPrice: max }));
     const setSortOption = (option: string) => setFilters(prev => ({ ...prev, sortOption: option }));
+    const setSearchQueryID = (query: string) => setFilters(prev => ({ ...prev, searchQueryID: query }));
 
     return (
         <GlobalContext.Provider value={{
             user, authLoading, login, register, logout,
             cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount,
-            filters, setSearchQuery, setCategory, setPriceRange, setSortOption
+            filters, setSearchQuery, setCategory, setPriceRange, setSortOption, setSearchQueryID
         }}>
             {children}
         </GlobalContext.Provider>

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+
 
 interface SignInProps {
     isActive: boolean;
@@ -10,6 +12,8 @@ interface SignInProps {
     loginPassword: string;
     setLoginPassword: (value: string) => void;
     handleLogin: (e: React.FormEvent) => void;
+    error: boolean;
+    loading: boolean | null;
 }
 
 const SignIn: React.FC<SignInProps> = ({
@@ -21,7 +25,24 @@ const SignIn: React.FC<SignInProps> = ({
     loginPassword,
     setLoginPassword,
     handleLogin,
+    error,
+    loading
 }) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const [validationError, setValidationError] = useState<string | null>(null);
+
+    const validateAndSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setValidationError(null);
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(loginEmail)) {
+            setValidationError("Please enter a valid email address.");
+            return;
+        }
+
+        handleLogin(e);
+    };
     return (
         <div
             className={`absolute top-0 h-full transition-all duration-300 ease-in-out left-0 
@@ -70,27 +91,52 @@ const SignIn: React.FC<SignInProps> = ({
                     required
                     className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
                 />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
-                />
-
-                <div className="w-full flex justify-between items-center mt-4 mb-4 text-center">
-                    <Link
-                        to={"/reset-password"}
-                        className="text-slate-600 text-[13px] no-underline hover:text-green-600 transition-colors "
+                {/* Password Field with Toggle */}
+                <div className="relative w-full">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                        className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
                     >
-                        Forget Your Password?
-                    </Link>
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
                 </div>
 
-                <button className="bg-[#4fc3f7] hover:bg-[#29b6f6] text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase cursor-pointer transition-colors shadow-md">
-                    Sign In
+                {/* Error Message Display */}
+                {(validationError || error) && (
+                    <div className="w-full bg-red-50 text-red-500 text-xs py-2 px-3 rounded mt-2 border border-red-100 animate-in fade-in slide-in-from-top-1">
+                        {validationError || error}
+                    </div>
+                )}
+
+                <div className="w-full flex justify-between items-center mt-4 mb-4">
+                    <Link to={"/reset-password"}><span className="text-slate-600 text-[13px] no-underline hover:text-green-600 transition-colors">Forget Your Password?</span></Link>
+                </div>
+
+                <button
+                    disabled={loading}
+                    className="bg-[#4fc3f7] active:bg-green-400 hover:bg-[#29b6f6] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase cursor-pointer transition-colors shadow-md flex items-center gap-2"
+                >
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {loading ? "Signing In..." : "Sign In"}
                 </button>
+
+                <div className="mt-6 block md:hidden">
+                    <p className="text-xs text-slate-500">
+                        Don't have an account? <br />
+                        <span onClick={() => setIsActive(true)} className="text-[#4fc3f7] active:bg-green-400 font-bold cursor-pointer hover:underline mt-1 inline-block">Sign Up</span>
+                    </p>
+                </div>
+
+
 
                 {/* MOBILE TOGGLE */}
                 <div className="mt-6 block md:hidden">
@@ -98,7 +144,7 @@ const SignIn: React.FC<SignInProps> = ({
                         Don't have an account? <br />
                         <span
                             onClick={() => setIsActive(true)}
-                            className="text-[#4fc3f7] font-bold cursor-pointer hover:underline mt-1 inline-block"
+                            className="text-[#4fc3f7] active:bg-green-400 font-bold cursor-pointer hover:underline mt-1 inline-block"
                         >
                             Sign Up
                         </span>

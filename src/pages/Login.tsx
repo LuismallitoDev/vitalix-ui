@@ -85,7 +85,7 @@ const Login = () => {
       <div className="min-h-screen bg-[#f0f4f8] font-['Montserrat',sans-serif] text-slate-700 flex flex-col">
         <Navigation />
         <div className="flex-1 flex items-center justify-center py-12 px-4">
-          <div className={`bg-white rounded-[30px] shadow-[0_5px_15px_rgba(0,0,0,0.1)] relative overflow-hidden w-full max-w-[400px] min-h-[550px] md:max-w-full md:w-[768px] md:min-h-[480px] transition-all duration-300 ${isActive ? 'active' : ''}`}>
+          <div className={`bg-white z-10 rounded-[30px] shadow-[0_5px_15px_rgba(0,0,0,0.1)] relative overflow-hidden w-full max-w-[400px] min-h-[550px] md:max-w-full md:w-[768px] md:min-h-[480px] transition-all duration-300 ${isActive ? 'active' : ''}`}>
 
             <SignUp
               isActive={isActive}
@@ -98,7 +98,8 @@ const Login = () => {
               registerPassword={registerPassword}
               setRegisterPassword={setRegisterPassword}
               handleRegister={handleRegister}
-
+              loading={false}
+              error={false}
             />
 
             <SignIn
@@ -110,6 +111,8 @@ const Login = () => {
               loginPassword={loginPassword}
               setLoginPassword={setLoginPassword}
               handleLogin={handleLogin}
+              loading={false}
+              error={false}
             />
 
             {/* Toggle Overlay */}
