@@ -25,6 +25,7 @@ const Login = () => {
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+  const [registerAddress, setRegisterAddress] = useState("");
 
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +45,7 @@ const Login = () => {
     const success = await login(loginEmail, loginPassword);
 
     if (!success) {
-      // Error is handled via Toast in context, but we can set local error state too if we want to show it inline
+      // Error is handled via Toast in context.
       setError("Invalid credentials");
     }
     setLoading(false);
@@ -55,7 +56,7 @@ const Login = () => {
     setError(null);
     setLoading(true);
 
-    const success = await register(registerName, registerEmail, registerPassword);
+    const success = await register(registerName, registerEmail, registerAddress, registerPassword);
 
     if (!success) {
       setError("Registration failed");
@@ -101,9 +102,11 @@ const Login = () => {
               setRegisterEmail={setRegisterEmail}
               registerPassword={registerPassword}
               setRegisterPassword={setRegisterPassword}
+              registerAddress={registerAddress}      // Pass State
+              setRegisterAddress={setRegisterAddress} // Pass Setter
               handleRegister={handleRegister}
-              loading={false}
-              error={false}
+              loading={loading}
+              error={isActive ? error : null}
             />
 
             <SignIn

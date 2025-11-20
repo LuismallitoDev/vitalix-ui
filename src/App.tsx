@@ -7,10 +7,12 @@ import { GlobalProvider } from "./context/GlobalContext";
 // Components
 import Login from "./pages/Login";
 import Store from "./pages/Store";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPass";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./components/Profile";
+import CartPage from "./components/CartPage";
+import UserOrders from "./components/UserOrders";
 
 // Create the client outside the component to prevent recreation on renders
 const queryClient = new QueryClient();
@@ -27,9 +29,12 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/orders" element={<UserOrders />} />
+              <Route path="/cart" element={<CartPage />} />
               <Route path="/" element={<Store />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"/>} />
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin" />} />
               <Route path="/reset-password" element={<ForgotPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

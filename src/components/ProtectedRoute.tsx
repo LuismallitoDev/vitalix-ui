@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useGlobalContext } from "../hooks/useGlobalContext";
 import Admin from "@/pages/Admin";
+
 interface ProtectedRouteProps {
     requiredRole: 'admin';
 }
@@ -24,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
     }
 
     // 3. Role Mismatch -> Redirect to Store
-    if (user.role !== requiredRole) {
+    if (user.role !== requiredRole ) {
         return <Navigate to="/" replace />;
     }
 

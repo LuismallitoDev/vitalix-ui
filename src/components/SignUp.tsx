@@ -11,9 +11,11 @@ interface SignUpProps {
     setRegisterEmail: (value: string) => void;
     registerPassword: string;
     setRegisterPassword: (value: string) => void;
+    registerAddress: string;
+    setRegisterAddress: (value: string) => void;
     handleRegister: (e: React.FormEvent) => void;
     loading: boolean;
-    error: boolean | null;
+    error: string | null;
 }
 
 const SignUp: React.FC<SignUpProps> = ({
@@ -26,20 +28,20 @@ const SignUp: React.FC<SignUpProps> = ({
     setRegisterEmail,
     registerPassword,
     setRegisterPassword,
+    registerAddress,
+    setRegisterAddress,
     handleRegister,
     loading,
     error
 }) => {
     const [showPassword, setShowPassword] = useState(false);
-
-    // Local validation error state (separate from server error)
     const [validationError, setValidationError] = useState<string | null>(null);
 
     const validateAndSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setValidationError(null);
 
-        // 1. Name Validation (Only letters and spaces)
+        // 1. Name Validation
         const nameRegex = /^[A-Za-z\s]+$/;
         if (!nameRegex.test(registerName)) {
             setValidationError("Los nombres solo pueden tener letras.");
@@ -53,15 +55,22 @@ const SignUp: React.FC<SignUpProps> = ({
             return;
         }
 
-        // 3. Password Length (Optional but recommended)
+        // 3. Password Length
         if (registerPassword.length < 6) {
-            setValidationError("La contraseña debe de tener mínimo 6 caracteres");
+            setValidationError("La contraseña debe tener mínimo 6 caracteres.");
+            return;
+        }
+
+        // 4. Address Validation
+        if (!registerAddress || registerAddress.length < 5) {
+            setValidationError("Ingrese una dirección válida (mínimo 5 caracteres).");
             return;
         }
 
         // If all valid, proceed
         handleRegister(e);
     };
+
     return (
         <div className={`absolute top-0 h-full transition-all duration-300 ease-in-out left-0 
           w-full md:w-1/2 
@@ -70,10 +79,9 @@ const SignUp: React.FC<SignUpProps> = ({
                 : 'opacity-0 z-0 md:opacity-0 md:z-[1]'
             }`}>
 
-            <form className="bg-white flex items-center justify-center flex-col px-8 md:px-10 h-full text-center" onSubmit={handleRegister}>
+            <form className="bg-white flex items-center justify-center flex-col px-8 md:px-10 h-full text-center" onSubmit={validateAndSubmit}>
                 <h1 className="text-3xl font-bold mb-4 text-slate-800">Crea una Cuenta</h1>
 
-                {/* GOOGLE BUTTON WITH SVG */}
                 <div className="w-full my-3">
                     <button
                         type="button"
@@ -90,15 +98,15 @@ const SignUp: React.FC<SignUpProps> = ({
                     </button>
                 </div>
 
-                <span className="text-xs mb-2 text-slate-500">o utiliza tu email para registrarte</span>
+                <span className="text-xs mb-2 text-slate-500">o utiliza tu email</span>
 
                 <input
                     type="text"
-                    placeholder="Nombre"
+                    placeholder="Nombre Completo"
                     value={registerName}
                     onChange={(e) => setRegisterName(e.target.value)}
                     required
-                    className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                    className="bg-slate-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
                 />
                 <input
                     type="email"
@@ -106,10 +114,9 @@ const SignUp: React.FC<SignUpProps> = ({
                     value={registerEmail}
                     onChange={(e) => setRegisterEmail(e.target.value)}
                     required
-                    className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                    className="bg-slate-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
                 />
 
-                {/* Password Field with Toggle */}
                 <div className="relative w-full">
                     <input
                         type={showPassword ? "text" : "password"}
@@ -117,7 +124,7 @@ const SignUp: React.FC<SignUpProps> = ({
                         value={registerPassword}
                         onChange={(e) => setRegisterPassword(e.target.value)}
                         required
-                        className="bg-sky-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                        className="bg-slate-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
                     />
                     <button
                         type="button"
@@ -128,7 +135,16 @@ const SignUp: React.FC<SignUpProps> = ({
                     </button>
                 </div>
 
-                {/* Error Message Display (Local Validation OR Server Error) */}
+                {/* ADDRESS FIELD */}
+                <input
+                    type="text"
+                    value={registerAddress}
+                    onChange={(e) => setRegisterAddress(e.target.value)}
+                    placeholder="Dirección (Ej: Calle 123 # 45-67)"
+                    required
+                    className="bg-slate-50 border border-transparent focus:border-green-400 my-2 py-2.5 px-4 text-[13px] rounded-lg w-full outline-none transition-colors"
+                />
+
                 {(validationError || error) && (
                     <div className="w-full bg-red-50 text-red-500 text-xs py-2 px-3 rounded mt-2 border border-red-100 animate-in fade-in slide-in-from-top-1">
                         {validationError || error}
@@ -137,16 +153,13 @@ const SignUp: React.FC<SignUpProps> = ({
 
                 <button
                     disabled={loading}
-                    onClick={validateAndSubmit}
-                    className="bg-[#4fc3f7] active:bg-green-400 hover:bg-[#29b6f6] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase mt-4 cursor-pointer transition-colors shadow-md flex items-center gap-2"
+                    type="submit"
+                    className="bg-[#4fc3f7] hover:bg-[#29b6f6] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs py-2.5 px-11 border border-transparent rounded-lg font-semibold uppercase mt-4 cursor-pointer transition-colors shadow-md flex items-center gap-2"
                 >
                     {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                     {loading ? "Creando..." : "Registrarse"}
                 </button>
 
-
-
-                {/* MOBILE TOGGLE */}
                 <div className="mt-6 block md:hidden">
                     <p className="text-xs text-slate-500">
                         ¿Ya tienes una cuenta? <br />

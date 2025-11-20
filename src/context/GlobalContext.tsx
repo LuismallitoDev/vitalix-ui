@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { Product } from "../components/ui/storeCard";
 import { toast } from "sonner";
+import { createOrder, OrderItem } from "../lib/api";
 
 // --- TYPES ---
 export interface User {
@@ -8,6 +9,11 @@ export interface User {
     email: string;
     displayName: string;
     role: 'admin' | 'user' | 'non-user';
+    phone?: string;
+    address?: string;
+    registerDate?: string;
+    status?: 'Active' | 'Suspended';
+    password?: string; // In real app, NEVER store password in session object, but needed here for localStorage update logic
 }
 
 export interface CartItem extends Product {
@@ -28,8 +34,9 @@ interface GlobalContextType {
     user: User | null;
     authLoading: boolean;
     login: (email: string, pass: string) => Promise<boolean>;
-    register: (name: string, email: string, pass: string) => Promise<boolean>;
+    register: (name: string, email: string, address: string, pass: string) => Promise<boolean>;
     logout: () => void;
+    updateUserProfile: (updatedUser: User) => void;
 
     // Cart State
     cart: CartItem[];
@@ -47,6 +54,9 @@ interface GlobalContextType {
     setPriceRange: (min: number, max: number) => void;
     setSortOption: (option: string) => void;
     setSearchQueryID: (query: string) => void;
+
+    // lIVE ORDES
+    submitOrder: () => Promise<boolean>;
 }
 
 // --- CONTEXT CREATION ---
@@ -104,8 +114,13 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
             const userData: User = {
                 uid: foundUser.uid,
                 email: foundUser.email,
-                displayName: foundUser.name,
-                role: "user" // Default role
+                displayName: foundUser.name || foundUser.displayName,
+                role: foundUser.role || "user",
+                phone: foundUser.phone || "",
+                address: foundUser.address || "",
+                registerDate: foundUser.registerDate || new Date().toISOString(),
+                status: foundUser.status || "Active",
+                password: foundUser.password // Needed to keep it for updates
             };
 
             // 3. Set Active Session
@@ -121,7 +136,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (name: string, email: string, pass: string): Promise<boolean> => {
+    const register = async (name: string, email: string, address: string, pass: string): Promise<boolean> => {
         setAuthLoading(true);
         await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -133,25 +148,26 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
             return false;
         }
 
-        const newUser = {
+        const newUser: User = {
             uid: Date.now().toString(),
-            name,
-            email,
-            password: pass
+            displayName: name,
+            email: email,
+            role: "user",
+            status: "Active",
+            registerDate: new Date().toISOString(),
+            phone: "",
+            address: address,
+            password: pass // Storing here for local logic
         };
 
         usersDb.push(newUser);
         localStorage.setItem("vitalix_users_db", JSON.stringify(usersDb));
 
-        // Auto-login as regular user
-        const sessionUser: User = {
-            uid: newUser.uid,
-            email: newUser.email,
-            displayName: newUser.name,
-            role: "user"
-        };
-        localStorage.setItem("vitalix_user", JSON.stringify(sessionUser));
-        setUser(sessionUser);
+        usersDb.push({ ...newUser, password: pass });
+        localStorage.setItem("vitalix_users_db", JSON.stringify(usersDb));
+
+        localStorage.setItem("vitalix_user", JSON.stringify(newUser));
+        setUser(newUser);
 
         toast.success("Cuenta creada exitosamente");
         setAuthLoading(false);
@@ -162,8 +178,23 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("vitalix_user");
         setUser(null);
         toast.info("Sesión cerrada");
+        window.location.href = "/login";
     };
+    // --- UPDATE PROFILE FUNCTION ---
+    const updateUserProfile = (updatedData: User) => {
+        // 1. Update State
+        setUser(updatedData);
 
+        // 2. Update Session Storage
+        localStorage.setItem("vitalix_user", JSON.stringify(updatedData));
+
+        // 3. Update "Database" Storage
+        const usersDb: User[] = JSON.parse(localStorage.getItem("vitalix_users_db") || "[]");
+        const newDb = usersDb.map(u => u.email === updatedData.email ? { ...u, ...updatedData } : u);
+        localStorage.setItem("vitalix_users_db", JSON.stringify(newDb));
+
+        toast.success("Perfil actualizado correctamente");
+    };
     // --- CART STATE ---
     const [cart, setCart] = useState<CartItem[]>(() => {
         const savedCart = localStorage.getItem("vitalix_cart");
@@ -243,11 +274,42 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     const setSortOption = (option: string) => setFilters(prev => ({ ...prev, sortOption: option }));
     const setSearchQueryID = (query: string) => setFilters(prev => ({ ...prev, searchQueryID: query }));
 
+    // --- 4- ORDER LIVE --- //
+    const submitOrder = async (): Promise<boolean> => {
+        if (!user || cart.length === 0) return false;
+
+        const orderItems: OrderItem[] = cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+        }));
+
+        const orderData = {
+            user_email: user.email,
+            user_name: user.displayName,
+            total: cartTotal,
+            items: orderItems
+        };
+
+        try {
+            await createOrder(orderData);
+            setCart([]); // Vaciar carrito
+            toast.success("Pedido enviado correctamente", {
+                description: "Puedes ver el estado en tu perfil."
+            });
+            return true;
+        } catch (error) {
+            toast.error("Error al enviar pedido");
+            return false;
+        }
+    };
     return (
         <GlobalContext.Provider value={{
             user, authLoading, login, register, logout,
             cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount,
-            filters, setSearchQuery, setCategory, setPriceRange, setSortOption, setSearchQueryID
+            filters, setSearchQuery, setCategory, setPriceRange, setSortOption, setSearchQueryID, updateUserProfile
+            , submitOrder
         }}>
             {children}
         </GlobalContext.Provider>

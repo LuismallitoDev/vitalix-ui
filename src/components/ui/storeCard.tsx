@@ -1,6 +1,8 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query"; // Import Query Hook
 import { getImages } from "@/lib/imageApi";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Navigate } from "react-router-dom";
 
 export interface Product {
     id: number;
@@ -21,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
     const stock = product.stock || 0;
     const hasStock = stock > 0;
     const isLowStock = stock > 0 && stock < 10;
-
+    const { user } = useGlobalContext();
     // --- FETCH IMAGE QUERY ---
     const { data: images, isLoading: imgLoading } = useQuery({
         queryKey: ['product-image', product.id],
@@ -30,6 +32,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         retry: 1
     });
 
+    const handleCartIncrease = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!user) {
+            alert("No has inicado sesión");
+            window.location.href = "/login";
+            return
+        }
+        if (hasStock && onAddToCart) {
+            onAddToCart();
+        }
+    }
     // Get the first image URL if available
     const imageUrl = images && images.length > 0 ? images[0].url : null;
     const fallbackImage = "https://ih1.redbubble.net/image.4905811472.8675/st,extra_large,507x507-pad,600x600,f8f8f8.jpg";
@@ -122,16 +135,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
 
                     <button
                         disabled={!hasStock}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (hasStock && onAddToCart) {
-                                onAddToCart();
-                                
-                            }
-                        }}
+                        onClick={handleCartIncrease}
                         className={`w-10 h-10 rounded-xl shadow-md transition-all duration-300 flex items-center justify-center ${hasStock
-                                ? 'bg-slate-800 text-white hover:bg-[#4fc3f7] cursor-pointer active:scale-95'
-                                : 'bg-slate-100 text-slate-300 shadow-none cursor-not-allowed'
+                            ? 'bg-slate-800 text-white hover:bg-[#4fc3f7] cursor-pointer active:scale-95'
+                            : 'bg-slate-100 text-slate-300 shadow-none cursor-not-allowed'
                             } `}
                     >
                         <i className="fa-solid fa-cart-shopping"></i>

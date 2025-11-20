@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@/components/ui/storeCard";
 import { getImages } from "@/lib/imageApi";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 interface AddToCartModalProps {
     isOpen: boolean;
@@ -13,8 +14,8 @@ interface AddToCartModalProps {
 const AddToCartModal: React.FC<AddToCartModalProps> = ({ isOpen, onClose, onConfirm, product }) => {
 
     const [quantity, setQuantity] = useState(1);
-    const productId = product?.id; // Safe access for the hook
-
+    const productId = product?.id; 
+    
     // We use 'enabled' to prevent the query from running if there is no product
     const { data: images, isLoading: imgLoading } = useQuery({
         queryKey: ['product-image', productId],
@@ -36,7 +37,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ isOpen, onClose, onConf
     const imageUrl = images && images.length > 0 ? images[0].url : null;
     const fallbackImage = "https://ih1.redbubble.net/image.4905811472.8675/st,extra_large,507x507-pad,600x600,f8f8f8.jpg";
 
-    const stock = product.stock || 0;
+    let stock = product.stock || 0;
 
     const handleIncrement = () => {
         if (quantity < stock) {
@@ -47,10 +48,12 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ isOpen, onClose, onConf
     const handleDecrement = () => {
         if (quantity > 1) {
             setQuantity(prev => prev - 1);
+            stock--;
         }
     };
 
     const handleConfirm = () => {
+
         if (quantity > 0 && quantity <= stock) {
             onConfirm(quantity);
             onClose();
