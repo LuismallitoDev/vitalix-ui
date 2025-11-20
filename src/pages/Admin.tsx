@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import Navigation from "@/components/Navigation";
+import { Navigate } from "react-router-dom";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Footer from "./Footer";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 interface Product {
   id: number;
@@ -22,6 +24,9 @@ const Admin = () => {
 
   const [newProductName, setNewProductName] = useState("");
   const [newProductPrice, setNewProductPrice] = useState("");
+
+  const { user } = useGlobalContext();
+
 
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();

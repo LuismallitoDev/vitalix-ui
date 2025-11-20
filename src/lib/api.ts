@@ -22,5 +22,6 @@ export const getProducts = async (): Promise<RawProduct[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch inventory');
   }
+  
   return await response.json();
 };

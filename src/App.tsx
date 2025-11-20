@@ -10,6 +10,7 @@ import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPass";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Create the client outside the component to prevent recreation on renders
 const queryClient = new QueryClient();
@@ -28,7 +29,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Store />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={<ProtectedRoute/>} />
               <Route path="/reset-password" element={<ForgotPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
