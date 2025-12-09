@@ -18,11 +18,13 @@ import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "sonner";
+import { User } from "lucide-react";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const Admin = () => {
   const queryClient = useQueryClient();
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
-
+  const { user } = useGlobalContext();
   // Cargar pedidos en tiempo real (Polling cada 3s)
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ['admin-orders'],
@@ -174,6 +176,15 @@ const Admin = () => {
                         </div>
                       </div>
 
+                      <div className="mb-6 p-4 bg-white rounded-lg border border-slate-200 flex items-center gap-3">
+                        <div className="bg-blue-50 p-2 rounded-full text-[#4fc3f7]">
+                          <FontAwesomeIcon icon={faEnvelope} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 uppercase font-bold">Dirección del Cliente</p>
+                          <p className="text-sm font-medium text-slate-700">{user.address ? user.address : "Dirección no especificada"}</p>
+                        </div>
+                      </div>
                       {/* Products List */}
                       <h4 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
                         <FontAwesomeIcon icon={faBoxOpen} /> Productos Solicitados

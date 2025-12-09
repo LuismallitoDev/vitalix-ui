@@ -34,7 +34,7 @@ const Footer = () => {
                             {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
                                 <a
                                     key={index}
-                                    href="#"
+                                    href="https://www.instagram.com/drogueriavitalixplus_medellin/"
                                     className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-[#4fc3f7] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
                                 >
                                     <Icon size={18} />

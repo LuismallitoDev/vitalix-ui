@@ -13,6 +13,7 @@ export interface RawProduct {
   utilidad: number;       
   precio_neto: number;    
   total_precio: number;   
+  categoría: string;
 }
 
 export const getProducts = async (): Promise<RawProduct[]> => {

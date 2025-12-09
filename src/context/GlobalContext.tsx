@@ -26,6 +26,7 @@ interface FilterState {
     category: string;
     minPrice: number;
     maxPrice: number;
+    quantity: number;
     sortOption: string;
 }
 
@@ -163,7 +164,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         usersDb.push(newUser);
         localStorage.setItem("vitalix_users_db", JSON.stringify(usersDb));
 
-        usersDb.push({ ...newUser, password: pass });
+        usersDb.push({ ...newUser, password: pass, address: address });
         localStorage.setItem("vitalix_users_db", JSON.stringify(usersDb));
 
         localStorage.setItem("vitalix_user", JSON.stringify(newUser));
@@ -265,7 +266,8 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         category: "Todos",
         minPrice: null,
         maxPrice: 10000000,
-        sortOption: "Recomendados"
+        sortOption: "Recomendados",
+        quantity: 1,
     });
 
     const setSearchQuery = (query: string) => setFilters(prev => ({ ...prev, searchQuery: query }));

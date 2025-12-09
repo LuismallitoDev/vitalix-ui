@@ -37,29 +37,30 @@ const Store = () => {
     setCurrentPage(1);
   }, [filters]);
   // 2. MAP DATA 
-  // Note: We removed 'image' from here because the ProductCard now fetches it individually.
   const products: Product[] = useMemo(() => {
     if (!rawProducts) return [];
 
     return rawProducts.map((item) => ({
       id: item.código,
       name: item.descripción,
-      category: "General",
       price: item.total_precio,
       rating: 0,
       reviews: 0,
-      stock: item["s._ent"]
+      stock: item["s._ent"],
+      category: item.categoría,
     }));
   }, [rawProducts]);
 
-  // 3. FILTER DATA
+  // 3. FILTER DATA (Lógica actualizada)
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
+      if (filters.sortOption === "Cantidad: No agotados" && product.stock <= 0) {
+        return false;
+      }
       if (filters.category !== "Todos" && product.category !== filters.category) return false;
       if (filters.searchQuery && !product.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) return false;
       if (filters.maxPrice > 0 && (product.price < filters.minPrice || product.price > filters.maxPrice)) return false;
       if (filters.searchQueryID) {
-
         if (!product.id.toString().includes(filters.searchQueryID)) {
           return false;
         }
@@ -68,9 +69,12 @@ const Store = () => {
     }).sort((a, b) => {
       if (filters.sortOption === "Precio: Menor a Mayor") return a.price - b.price;
       if (filters.sortOption === "Precio: Mayor a Menor") return b.price - a.price;
+      if (filters.sortOption === "Cantidad: No agotados") return b.stock - a.stock;
+
       return 0;
     });
   }, [filters, products]);
+
   // --- PAGINATION LOGIC ---
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -132,7 +136,7 @@ const Store = () => {
         <div className="flex flex-col lg:flex-row gap-8 relative items-start">
 
           <div className={`lg:block w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-24 z-10 ${isFiltersOpen ? 'block' : 'hidden'}`}>
-            <SidebarFilters />
+            <SidebarFilters products={products} /> 
           </div>
 
           <div className="flex-1 min-w-0">
@@ -149,9 +153,10 @@ const Store = () => {
                     onChange={(e) => setSortOption(e.target.value)}
                     className="w-full sm:w-auto appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg py-2 pl-3 pr-8 focus:outline-none focus:border-[#4fc3f7] cursor-pointer"
                   >
-                    <option>Recommended</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
+                    <option>Recomendados</option>
+                    <option>Precio: Menor a Mayor</option>
+                    <option>Precio: Mayor a Menor</option>
+                    <option>Cantidad: No agotados</option>
                   </select>
                   <FontAwesomeIcon icon={faSort} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
