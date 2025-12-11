@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useGlobalContext } from "../hooks/useGlobalContext";
 import Navigation from "@/components/Navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,10 +17,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { getImages } from "@/lib/imageApi";
+import { getImages } from "@/lib/imageApi"; // Asegúrate de tener esto
 
-
-const CartItemRow = ({ item, updateQuantity, removeFromCart }) => {
+// --- COMPONENTE DE FILA (VISUALIZACIÓN DE PRODUCTO) ---
+const CartItemRow = ({ item, updateQuantity, removeFromCart }: any) => {
   // Fetch de imagen individual
   const { data: images, isLoading } = useQuery({
     queryKey: ['product-image', item.id],
@@ -34,6 +34,7 @@ const CartItemRow = ({ item, updateQuantity, removeFromCart }) => {
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-6 items-center">
       
+      {/* IMAGEN */}
       <div className="w-24 h-24 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center p-2 border border-slate-100 relative overflow-hidden">
         {isLoading ? (
           <div className="w-full h-full bg-slate-200 animate-pulse rounded"></div>
@@ -46,14 +47,14 @@ const CartItemRow = ({ item, updateQuantity, removeFromCart }) => {
         )}
       </div>
 
-      {/* Info */}
+      {/* INFO DEL PRODUCTO */}
       <div className="flex-1 text-center sm:text-left">
         <h3 className="font-bold text-slate-800 text-lg mb-1">{item.name}</h3>
         <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-2">{item.category || "General"}</p>
         <p className="text-[#4fc3f7] font-bold">${item.price.toLocaleString('es-CO')}</p>
       </div>
 
-      {/* Controles */}
+      {/* CONTROLES DE CANTIDAD */}
       <div className="flex flex-col items-center gap-3">
         <div className="flex items-center border border-slate-200 rounded-lg bg-white">
           <button
@@ -78,7 +79,7 @@ const CartItemRow = ({ item, updateQuantity, removeFromCart }) => {
         </button>
       </div>
 
-      {/* Subtotal Item */}
+      {/* SUBTOTAL POR ITEM */}
       <div className="w-24 text-right hidden sm:block">
         <p className="text-xs text-slate-400 mb-1">Subtotal</p>
         <p className="font-bold text-slate-800">${(item.price * item.quantity).toLocaleString('es-CO')}</p>
@@ -89,7 +90,7 @@ const CartItemRow = ({ item, updateQuantity, removeFromCart }) => {
 
 // --- PÁGINA PRINCIPAL DEL CARRITO ---
 const CartPage = () => {
-  const { cart, updateQuantity, removeFromCart, cartTotal, clearCart, user, submitOrder } = useGlobalContext();
+  const { cart, updateQuantity, removeFromCart, cartTotal, user, submitOrder } = useGlobalContext();
   const navigate = useNavigate();
 
   // Estados locales para datos de envío
@@ -109,6 +110,7 @@ const CartPage = () => {
   const shippingCost = cartTotal < 10000 ? 6000 : 0;
   const finalTotal = cartTotal + shippingCost;
 
+  // --- CONFIRMAR PEDIDO ---
   const handleCheckout = async () => {
     if (!user) {
       toast.error("Debes iniciar sesión para realizar el pedido");
@@ -128,18 +130,14 @@ const CartPage = () => {
 
     setIsSubmitting(true);
 
-    // Aquí podrías pasar los datos actualizados de contacto al submitOrder si tu backend lo soporta
-    // Por ahora, actualizamos el contexto o asumimos que el backend usa los del usuario
-    // O mejor aún: pasamos estos datos como parte del objeto del pedido.
-
-    // NOTA: Para que esto funcione perfecto, deberíamos actualizar 'submitOrder' para aceptar estos datos extra
-    // pero por simplicidad usaremos la función existente y asumiremos que estos son los datos finales.
-
-    const success = await submitOrder(); // Si modificaste submitOrder para recibir datos, pásalos aquí
+    // 1. Llamamos a submitOrder pasando costo y dirección
+    const success = await submitOrder(shippingCost, confirmAddress); 
+    
     setIsSubmitting(false);
 
     if (success) {
-      navigate("/profile");
+      // 2. Si todo sale bien, redirigimos al ADMIN
+      navigate("/admin");
     }
   };
 
@@ -170,7 +168,7 @@ const CartPage = () => {
         ) : (
           <div className="flex flex-col lg:flex-row gap-8">
 
-            {/* --- LISTA DE PRODUCTOS --- */}
+            {/* --- SECCIÓN IZQUIERDA: LISTA DE PRODUCTOS --- */}
             <div className="flex-1 space-y-4">
               {cart.map((item) => (
                 <CartItemRow
@@ -182,10 +180,10 @@ const CartPage = () => {
               ))}
             </div>
 
-            {/* --- RESUMEN Y CONFIRMACIÓN --- */}
+            {/* --- SECCIÓN DERECHA: DATOS Y PAGO --- */}
             <div className="w-full lg:w-96 flex-shrink-0 space-y-6">
 
-              {/* DATOS DE ENVÍO */}
+              {/* FORMULARIO DE ENVÍO */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
                   <FontAwesomeIcon icon={faUser} className="text-slate-400" /> Datos de Envío
@@ -232,7 +230,7 @@ const CartPage = () => {
                     <span>${cartTotal.toLocaleString('es-CO')}</span>
                   </div>
 
-                  {/* Lógica de Envío */}
+                  {/* Envío */}
                   <div className="flex justify-between items-center text-slate-600">
                     <span className="flex items-center gap-2">
                       Envío <FontAwesomeIcon icon={faTruck} className="text-xs text-slate-400" />
@@ -255,6 +253,7 @@ const CartPage = () => {
                   <span className="font-extrabold text-2xl text-[#4fc3f7]">${finalTotal.toLocaleString('es-CO')}</span>
                 </div>
 
+                {/* BOTÓN DE ACCIÓN */}
                 <button
                   onClick={handleCheckout}
                   disabled={isSubmitting}

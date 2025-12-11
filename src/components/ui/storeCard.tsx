@@ -1,8 +1,8 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query"; // Import Query Hook
+import { useQuery } from "@tanstack/react-query"; 
 import { getImages } from "@/lib/imageApi";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Navigate } from "react-router-dom";
+
 
 export interface Product {
     id: number;

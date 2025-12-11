@@ -2,6 +2,8 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useGlobalContext } from "../hooks/useGlobalContext";
 import Admin from "@/pages/Admin";
+import DriverDashboard from "@/pages/Driver";
+import AssistantDashboard from "@/pages/Assistant";
 
 interface ProtectedRouteProps {
     requiredRole: 'admin';
@@ -25,12 +27,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
     }
 
     // 3. Role Mismatch -> Redirect to Store
-    if (user.role !== requiredRole ) {
-        return <Navigate to="/" replace />;
+    if (user.email === "admin@vitalix.com") {
+        return <Admin />
     }
-
+    if (user.email === "domiciliario@vitalix.com") {
+        return <DriverDashboard />
+    }
+    if (user.email === "asistente1@vitalix.com") {
+        return <AssistantDashboard />
+    }
     // 4. Access Granted -> Render child routes
-    return <Admin />;
+    return <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;

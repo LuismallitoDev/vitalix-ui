@@ -13,6 +13,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./components/Profile";
 import CartPage from "./components/CartPage";
 import UserOrders from "./components/UserOrders";
+import DriverDashboard from "./pages/Driver";
+import 'leaflet/dist/leaflet.css';
+import AssistantDashboard from "./pages/Assistant";
 
 // Create the client outside the component to prevent recreation on renders
 const queryClient = new QueryClient();
@@ -36,6 +39,8 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<ProtectedRoute requiredRole="admin" />} />
               <Route path="/reset-password" element={<ForgotPassword />} />
+              <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/assistant" element={<AssistantDashboard/>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

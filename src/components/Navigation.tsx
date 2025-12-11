@@ -73,7 +73,7 @@ const Navigation = () => {
               <span className="hidden lg:inline text-sm font-medium">Tienda</span>
             </NavLink>
 
-            {user?.role === 'admin' && (
+            {user?.email === 'admin@vitalix.com' && (
               <NavLink
                 to="/admin"
                 className="flex items-center gap-2 text-slate-600 hover:text-[#4fc3f7] transition-colors"
@@ -81,6 +81,26 @@ const Navigation = () => {
               >
                 <FontAwesomeIcon icon={faShieldHalved} size="lg" />
                 <span className="hidden lg:inline text-sm font-medium">Admin</span>
+              </NavLink>
+            )}
+            {user?.email === 'domiciliario@vitalix.com' && (
+              <NavLink
+                to="/driver"
+                className="flex items-center gap-2 text-slate-600 hover:text-[#4fc3f7] transition-colors"
+                activeClassName="text-[#4fc3f7] font-medium"
+              >
+                <FontAwesomeIcon icon={faShieldHalved} size="lg" />
+                <span className="hidden lg:inline text-sm font-medium">Domiciliario</span>
+              </NavLink>
+            )}
+             {user?.email === 'asistente1@vitalix.com' && (
+              <NavLink
+                to="/assistant"
+                className="flex items-center gap-2 text-slate-600 hover:text-[#4fc3f7] transition-colors"
+                activeClassName="text-[#4fc3f7] font-medium"
+              >
+                <FontAwesomeIcon icon={faShieldHalved} size="lg" />
+                <span className="hidden lg:inline text-sm font-medium">Auxiliar</span>
               </NavLink>
             )}
             <button

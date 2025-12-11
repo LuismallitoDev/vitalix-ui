@@ -5,12 +5,17 @@ export interface RawProductImage {
 }
 
 export const getImages = async (id: number): Promise<RawProductImage[]> => {
-  // This fetches from your backend based on the product ID
   const response = await fetch(`http://localhost:8000/imagen/${id}`);
   
-  if (!response.ok) {
-    // If 404 or error, we can throw. The useQuery will catch it and we show fallback image.
-    throw new Error('Failed to fetch images');
+  // FIX: If 404 (Image not found), just return empty array instead of throwing error
+  if (response.status === 404) {
+    return [];
   }
+
+  // Still throw for server errors (500) so React Query can retry
+  if (!response.ok) {
+    throw new Error('Failed to fetch images');  
+  }
+  console.log(response.status);
   return await response.json();
 };

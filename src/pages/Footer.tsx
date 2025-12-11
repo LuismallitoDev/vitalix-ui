@@ -1,5 +1,4 @@
 import {
-    Pill,
     Facebook,
     Twitter,
     Instagram,

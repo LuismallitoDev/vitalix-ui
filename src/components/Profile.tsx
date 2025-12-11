@@ -12,15 +12,15 @@ import {
     faPenToSquare,
     faFloppyDisk,
     faXmark,
-    faShoppingCart,
-    faList,
-    faClipboardList
+    faClipboardList,
+    faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
-    const { user, updateUserProfile } = useGlobalContext();
+    const { user, updateUserProfile, authLoading } = useGlobalContext();
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -37,25 +37,32 @@ const Profile = () => {
                 displayName: user.displayName || "",
                 phone: user.phone || "",
                 address: user.address || "",
-                password: user.password || ""
+                password: "" // Contraseña siempre inicia vacía por seguridad
             });
         }
     }, [user]);
 
     if (!user) return null;
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData.displayName.trim()) {
-            // Simple validation
             alert("El nombre es obligatorio");
             return;
         }
 
-        updateUserProfile({
-            ...user,
-            ...formData
+        setIsSaving(true);
+        const success = await updateUserProfile({
+            displayName: formData.displayName,
+            phone: formData.phone,
+            address: formData.address,
+            password: formData.password // Si está vacío, el contexto lo ignorará
         });
-        setIsEditing(false);
+
+        setIsSaving(false);
+        if (success) {
+            setIsEditing(false);
+            setFormData(prev => ({ ...prev, password: "" })); // Limpiar campo password
+        }
     };
 
     const handleCancel = () => {
@@ -64,7 +71,7 @@ const Profile = () => {
             displayName: user.displayName || "",
             phone: user.phone || "",
             address: user.address || "",
-            password: user.password || ""
+            password: ""
         });
         setIsEditing(false);
     };
@@ -98,15 +105,18 @@ const Profile = () => {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={handleCancel}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors font-medium text-sm"
+                                        disabled={isSaving}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors font-medium text-sm disabled:opacity-50"
                                     >
                                         <FontAwesomeIcon icon={faXmark} /> Cancelar
                                     </button>
                                     <button
                                         onClick={handleSave}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#4fc3f7] hover:bg-[#29b6f6] text-white shadow-md transition-colors font-medium text-sm"
+                                        disabled={isSaving}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#4fc3f7] hover:bg-[#29b6f6] text-white shadow-md transition-colors font-medium text-sm disabled:bg-slate-300"
                                     >
-                                        <FontAwesomeIcon icon={faFloppyDisk} /> Guardar Cambios
+                                        {isSaving ? <FontAwesomeIcon icon={faSpinner} className="animate-spin" /> : <FontAwesomeIcon icon={faFloppyDisk} />}
+                                        {isSaving ? "Guardando..." : "Guardar Cambios"}
                                     </button>
                                 </div>
                             ) : (
@@ -145,7 +155,7 @@ const Profile = () => {
                             <div className="space-y-6">
                                 <div className="group">
                                     <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Nombre Completo</label>
-                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100 group-focus-within:border-[#4fc3f7] group-focus-within:ring-1 group-focus-within:ring-[#4fc3f7] transition-all">
+                                    <div className={`flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border ${isEditing ? 'border-slate-200 group-focus-within:border-[#4fc3f7]' : 'border-slate-100'} transition-all`}>
                                         <FontAwesomeIcon icon={faUser} className="text-slate-400" />
                                         {isEditing ? (
                                             <input
@@ -162,7 +172,7 @@ const Profile = () => {
 
                                 <div className="group">
                                     <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Teléfono</label>
-                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100 group-focus-within:border-[#4fc3f7] group-focus-within:ring-1 group-focus-within:ring-[#4fc3f7] transition-all">
+                                    <div className={`flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border ${isEditing ? 'border-slate-200 group-focus-within:border-[#4fc3f7]' : 'border-slate-100'} transition-all`}>
                                         <FontAwesomeIcon icon={faPhone} className="text-slate-400" />
                                         {isEditing ? (
                                             <input
@@ -181,15 +191,18 @@ const Profile = () => {
                                 </div>
 
                                 <div className="group">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Contraseña</label>
-                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100 group-focus-within:border-[#4fc3f7] group-focus-within:ring-1 group-focus-within:ring-[#4fc3f7] transition-all">
+                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">
+                                        {isEditing ? "Nueva Contraseña (Opcional)" : "Contraseña"}
+                                    </label>
+                                    <div className={`flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border ${isEditing ? 'border-slate-200 group-focus-within:border-[#4fc3f7]' : 'border-slate-100'} transition-all`}>
                                         <FontAwesomeIcon icon={faShieldHalved} className="text-slate-400" />
                                         {isEditing ? (
                                             <input
-                                                type="text" // Visible for editing in this demo
+                                                type="text"
+                                                placeholder="Dejar vacío para no cambiar"
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                className="bg-transparent w-full outline-none text-slate-700 font-medium"
+                                                className="bg-transparent w-full outline-none text-slate-700 font-medium placeholder:text-slate-300"
                                             />
                                         ) : (
                                             <span className="text-slate-700 font-medium">••••••••</span>
@@ -210,7 +223,7 @@ const Profile = () => {
 
                                 <div className="group">
                                     <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Dirección Predeterminada</label>
-                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100 group-focus-within:border-[#4fc3f7] group-focus-within:ring-1 group-focus-within:ring-[#4fc3f7] transition-all">
+                                    <div className={`flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-xl border ${isEditing ? 'border-slate-200 group-focus-within:border-[#4fc3f7]' : 'border-slate-100'} transition-all`}>
                                         <FontAwesomeIcon icon={faLocationDot} className="text-slate-400" />
                                         {isEditing ? (
                                             <input

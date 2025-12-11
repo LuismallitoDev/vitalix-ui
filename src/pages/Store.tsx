@@ -32,6 +32,7 @@ const Store = () => {
     queryFn: getProducts,
     staleTime: 1000 * 60,
   });
+
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -51,7 +52,7 @@ const Store = () => {
     }));
   }, [rawProducts]);
 
-  // 3. FILTER DATA (Lógica actualizada)
+  // 3. FILTER DATA
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       if (filters.sortOption === "Cantidad: No agotados" && product.stock <= 0) {
@@ -136,7 +137,7 @@ const Store = () => {
         <div className="flex flex-col lg:flex-row gap-8 relative items-start">
 
           <div className={`lg:block w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-24 z-10 ${isFiltersOpen ? 'block' : 'hidden'}`}>
-            <SidebarFilters products={products} /> 
+            <SidebarFilters products={products} />
           </div>
 
           <div className="flex-1 min-w-0">

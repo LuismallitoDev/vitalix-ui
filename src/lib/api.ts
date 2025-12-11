@@ -72,5 +72,3 @@ export const updateOrderStatus = async (orderId: number, status: string) => {
     if (!response.ok) throw new Error('Error actualizando estado');
     return await response.json();
 };
-
-// ... (Mantén getProducts y getImages si los usas para mostrar la tienda)
